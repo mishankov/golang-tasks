@@ -20,13 +20,10 @@ const (
 )
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	procesedTasks := make(chan task.Task)
+	ctx, cancel := context.WithTimeout(context.Background(), tasksGenerationSeconds*time.Second)
+	defer cancel()
 
-	go func() {
-		time.Sleep(tasksGenerationSeconds * time.Second)
-		cancel()
-	}()
+	procesedTasks := make(chan task.Task)
 
 	generator := generator.New()
 	generatedTasks := generator.Generate(ctx)
