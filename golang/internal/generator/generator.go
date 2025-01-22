@@ -16,7 +16,7 @@ func New() *Generator {
 }
 
 func (g *Generator) Generate(ctx context.Context) chan task.Task {
-	ch := make(chan task.Task)
+	tasks := make(chan task.Task)
 	totalTasks := 0
 
 	go func() {
@@ -28,14 +28,14 @@ func (g *Generator) Generate(ctx context.Context) chan task.Task {
 
 			select {
 			case <-ctx.Done():
-				close(ch)
+				close(tasks)
 				log.Println("Generation stopped. Total tasks:", totalTasks)
 				return
-			case ch <- newTask:
+			case tasks <- newTask:
 				totalTasks++
 			}
 		}
 	}()
 
-	return ch
+	return tasks
 }

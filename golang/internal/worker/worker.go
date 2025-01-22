@@ -13,8 +13,8 @@ func New() *Worker {
 	return &Worker{}
 }
 
-func (w *Worker) Work(wg *sync.WaitGroup, inputChan chan task.Task, resultChan chan task.Task) {
-	for currentTask := range inputChan {
+func (w *Worker) Work(wg *sync.WaitGroup, inputTasks chan task.Task, processedTasks chan task.Task) {
+	for currentTask := range inputTasks {
 		time.Sleep(time.Millisecond * 150)
 		if currentTask.Error != nil {
 			currentTask.Result = task.Fail
@@ -24,7 +24,7 @@ func (w *Worker) Work(wg *sync.WaitGroup, inputChan chan task.Task, resultChan c
 
 		currentTask.FinishTime = time.Now()
 
-		resultChan <- currentTask
+		processedTasks <- currentTask
 	}
 
 	wg.Done()

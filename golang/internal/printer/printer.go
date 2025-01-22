@@ -13,8 +13,8 @@ import (
 type PrintFormat int
 
 const (
-	List   = PrintFormat(0)
-	Amount = PrintFormat(1)
+	ListFormat   = PrintFormat(0)
+	AmountFormat = PrintFormat(1)
 )
 
 type Printer struct {
@@ -43,14 +43,14 @@ func (p *Printer) Print(period time.Duration, tasks chan task.Task) {
 				log.Println("Error writing header:", err)
 			}
 
-			if p.format == List {
+			if p.format == ListFormat {
 				for _, task := range successfulTasks {
 					_, err := p.writer.Write([]byte(task.String() + "\n"))
 					if err != nil {
 						log.Println("Error writing successful task:", err)
 					}
 				}
-			} else if p.format == Amount {
+			} else if p.format == AmountFormat {
 				_, err := p.writer.Write([]byte(fmt.Sprintln(len(successfulTasks))))
 				if err != nil {
 					log.Println("Error writing successful task:", err)
@@ -62,14 +62,14 @@ func (p *Printer) Print(period time.Duration, tasks chan task.Task) {
 				log.Println("Error writing failed header:", err)
 			}
 
-			if p.format == List {
+			if p.format == ListFormat {
 				for _, task := range failedTasks {
 					_, err := p.writer.Write([]byte(task.String() + "\n"))
 					if err != nil {
 						log.Println("Error writing failed task:", err)
 					}
 				}
-			} else if p.format == Amount {
+			} else if p.format == AmountFormat {
 				_, err := p.writer.Write([]byte(fmt.Sprintln(len(failedTasks))))
 				if err != nil {
 					log.Println("Error writing successful task:", err)

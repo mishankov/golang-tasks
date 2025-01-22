@@ -16,12 +16,12 @@ const (
 	workersAmount            = 4
 	tasksGenerationSeconds   = 10
 	resultPrintPeriodSeconds = 3
-	printFormat              = printer.Amount
+	printFormat              = printer.ListFormat
 )
 
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
-	resultChan := make(chan task.Task)
+	procesedTasks := make(chan task.Task)
 
 	go func() {
 		time.Sleep(tasksGenerationSeconds * time.Second)
@@ -29,20 +29,20 @@ func main() {
 	}()
 
 	generator := generator.New()
-	newTasksChan := generator.Generate(ctx)
+	generatedTasks := generator.Generate(ctx)
 
 	var wg sync.WaitGroup
 	for range workersAmount {
 		wg.Add(1)
 		worker := worker.New()
-		go worker.Work(&wg, newTasksChan, resultChan)
+		go worker.Work(&wg, generatedTasks, procesedTasks)
 	}
 
 	go func() {
 		wg.Wait()
-		close(resultChan)
+		close(procesedTasks)
 	}()
 
 	printer := printer.New(os.Stdout, printFormat)
-	printer.Print(resultPrintPeriodSeconds*time.Second, resultChan)
+	printer.Print(resultPrintPeriodSeconds*time.Second, procesedTasks)
 }

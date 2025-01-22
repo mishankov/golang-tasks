@@ -14,7 +14,7 @@ func TestPrinter(t *testing.T) {
 	t.Parallel()
 
 	buffer := &bytes.Buffer{}
-	p := printer.New(buffer, printer.List)
+	p := printer.New(buffer, printer.ListFormat)
 	tasksChan := make(chan task.Task)
 
 	go func() {
